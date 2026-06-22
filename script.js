@@ -265,20 +265,56 @@
             restoreFromHash();
             window.addEventListener('hashchange', restoreFromHash);
 
-            // ---------- АНИМАЦИЯ ЛИСТИКА ПРИ КЛИКЕ ----------
-            document.addEventListener('click', (e) => {
-                for (let i = 0; i < 3; i++) {
-                    const leaf = document.createElement('div');
-                    leaf.className = 'click-leaf';
-                    leaf.textContent = '🍃';
-                    leaf.style.left = (e.clientX + (Math.random() - 0.5) * 20) + 'px';
-                    leaf.style.top = (e.clientY + (Math.random() - 0.5) * 20) + 'px';
-                    leaf.style.setProperty('--dx', (Math.random() - 0.5) * 80 + 'px');
-                    leaf.style.setProperty('--dy', -(30 + Math.random() * 50) + 'px');
-                    leaf.style.setProperty('--rot', (Math.random() * 360) + 'deg');
-                    leaf.style.animationDelay = (i * 0.05) + 's';
-                    document.body.appendChild(leaf);
-                    leaf.addEventListener('animationend', () => leaf.remove());
+            // ---------- АНИМАЦИЯ ЛИСТИКА ПРИ КЛИКЕ (оптимизированная) ----------
+            const leafPool = [];
+            const maxLeaves = 30;
+            
+            function createLeaf() {
+                const leaf = document.createElement('div');
+                leaf.className = 'click-leaf';
+                leaf.textContent = '🍃';
+                leaf.style.willChange = 'transform, opacity';
+                return leaf;
+            }
+            
+            function getLeaf() {
+                if (leafPool.length > 0) {
+                    return leafPool.pop();
                 }
-            });
+                return createLeaf();
+            }
+            
+            function recycleLeaf(leaf) {
+                if (leafPool.length < maxLeaves) {
+                    leaf.style.display = 'none';
+                    leafPool.push(leaf);
+                } else {
+                    leaf.remove();
+                }
+            }
+            
+            document.addEventListener('click', (e) => {
+                requestAnimationFrame(() => {
+                    for (let i = 0; i < 3; i++) {
+                        const leaf = getLeaf();
+                        leaf.style.display = '';
+                        leaf.style.left = (e.clientX + (Math.random() - 0.5) * 20) + 'px';
+                        leaf.style.top = (e.clientY + (Math.random() - 0.5) * 20) + 'px';
+                        leaf.style.setProperty('--dx', (Math.random() - 0.5) * 80 + 'px');
+                        leaf.style.setProperty('--dy', -(30 + Math.random() * 50) + 'px');
+                        leaf.style.setProperty('--rot', (Math.random() * 360) + 'deg');
+                        leaf.style.animationDelay = (i * 0.05) + 's';
+                        document.body.appendChild(leaf);
+                        
+                        const onEnd = () => {
+                            leaf.removeEventListener('animationend', onEnd);
+                            leaf.style.animation = 'none';
+                            leaf.offsetHeight;
+                            leaf.style.animation = '';
+                            recycleLeaf(leaf);
+                        };
+                        leaf.addEventListener('animationend', onEnd);
+                    }
+                });
+            }, { passive: true });
 })();
