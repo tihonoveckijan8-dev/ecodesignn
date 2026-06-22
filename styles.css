@@ -397,11 +397,11 @@ a, button, .nav-tab, .card, .work-card, .dot, .slider-btn, .btn-primary, input, 
     isolation: isolate;
 }
 
-/* Current animation */
+/* Current animation — compositor-only for 90fps */
 @keyframes currentPulse {
-    0% { box-shadow: 0 0 0 2px rgba(74,140,63,0.4), 0 0 8px 2px rgba(74,140,63,0.3), 0 0 16px 4px rgba(74,140,63,0.15); }
-    50% { box-shadow: 0 0 0 3px rgba(124,185,110,0.6), 0 0 12px 3px rgba(74,140,63,0.5), 0 0 24px 6px rgba(74,140,63,0.25); }
-    100% { box-shadow: 0 0 0 2px rgba(74,140,63,0.4), 0 0 8px 2px rgba(74,140,63,0.3), 0 0 16px 4px rgba(74,140,63,0.15); }
+    0% { transform: scale(1); opacity: 0.8; }
+    50% { transform: scale(1.05); opacity: 1; }
+    100% { transform: scale(1); opacity: 0.8; }
 }
 @keyframes currentRadiate {
     from { transform: rotate(0deg); }
@@ -848,8 +848,14 @@ a, button, .nav-tab, .card, .work-card, .dot, .slider-btn, .btn-primary, input, 
     .hero-badge { justify-content: center; margin-left: auto; margin-right: auto; }
     .hero-subtitle { margin-left: auto; margin-right: auto; }
 
-    /* Smooth 60fps — no steps */
-    .leaf { contain: layout style paint; }
+    /* GPU promotion for all animated elements — 90fps */
+    .leaf { contain: layout style paint; will-change: transform; }
+    .circuit-lines svg circle { will-change: transform; contain: layout style paint; }
+    .mobile-menu-container .nav-tab.active { will-change: transform; }
+    .mobile-menu-container .nav-tab.active::after { will-change: transform; }
+    .mobile-menu-container .nav-tab.active::before { will-change: transform; }
+    .click-leaf { will-change: transform, opacity; }
+    .tab-indicator { will-change: left, width; }
 
     /* Faster leaf animation */
     .leaf:nth-child(1) { animation-duration: 8s; }
@@ -878,7 +884,7 @@ a, button, .nav-tab, .card, .work-card, .dot, .slider-btn, .btn-primary, input, 
 
     .mobile-menu-container .nav-tab { backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); }
     .mobile-overlay { backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); }
-    .logo-icon { backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); }
+    .logo-icon { backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); transition: transform 0.15s; }
     .slider-btn { backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px); }
 
     /* Faster button current animations */
@@ -964,8 +970,13 @@ a, button, .nav-tab, .card, .work-card, .dot, .slider-btn, .btn-primary, input, 
     .circuit-header { opacity: 0.5; }
     .circuit-footer { opacity: 0.4; }
 
-    /* Smooth 60fps — no steps */
-    .leaf { contain: layout style paint; }
+    /* GPU promotion for all animated elements — 90fps */
+    .leaf { contain: layout style paint; will-change: transform; }
+    .circuit-lines svg circle { will-change: transform; contain: layout style paint; }
+    .mobile-menu-container .nav-tab.active { will-change: transform; }
+    .mobile-menu-container .nav-tab.active::after { will-change: transform; }
+    .mobile-menu-container .nav-tab.active::before { will-change: transform; }
+    .tab-indicator { will-change: left, width; }
 
     /* Faster leaf animation */
     .leaf:nth-child(1) { animation-duration: 9s; }
