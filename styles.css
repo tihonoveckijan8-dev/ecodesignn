@@ -1172,16 +1172,90 @@ a, button, .nav-tab, .card, .work-card, .dot, .slider-btn, .btn-primary, input, 
 /* Оптимизация ресурсов */
 .leaves-container {
     contain: layout style;
+    will-change: contents;
 }
 .slider-container {
     contain: layout style;
 }
 .tab-content {
     contain: layout style;
+    content-visibility: auto;
+    contain-intrinsic-size: auto 500px;
 }
 .header {
     contain: layout style;
 }
 .footer {
     contain: layout style;
+}
+
+/* Оптимизация SVG для рендеринга */
+.circuit-lines {
+    will-change: contents;
+}
+
+/* Оптимизация изображений */
+img {
+    content-visibility: auto;
+    contain-intrinsic-size: auto 400px;
+}
+
+/* Предотвращение reflow */
+.card, .work-card, .program-item, .timeline-item {
+    contain: layout style paint;
+}
+
+/* Оптимизация шрифтов */
+.material-symbols-outlined {
+    font-display: swap;
+}
+
+/* Ускорение анимаций через GPU */
+.leaf, .click-leaf, .circuit-lines svg circle {
+    will-change: transform;
+    transform: translateZ(0);
+}
+
+/* Предзагрузка критических ресурсов */
+@font-face {
+    font-family: 'Inter';
+    font-display: swap;
+    src: local('Inter');
+}
+
+/* Оптимизация рендеринга */
+.hero-card, .code-block {
+    contain: layout style paint;
+}
+
+/* Оптимизация скролла */
+.main {
+    scroll-behavior: smooth;
+    overscroll-behavior: contain;
+}
+
+/* Оптимизация для тач-устройств */
+@media (hover: none) {
+    .card:hover, .work-card:hover {
+        transform: none;
+    }
+}
+
+/* Оптимизация для слабых устройств */
+@media (prefers-reduced-motion: reduce) {
+    .leaf, .click-leaf {
+        animation: none !important;
+        opacity: 0.3;
+    }
+    .circuit-lines svg circle {
+        animation: none !important;
+        opacity: 0.5;
+    }
+}
+
+/* Кэширование статических ресурсов */
+@media (prefers-reduced-motion: no-preference) {
+    .leaf, .click-leaf {
+        backface-visibility: hidden;
+    }
 }
