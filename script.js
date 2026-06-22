@@ -1,4 +1,5 @@
 (function() {
+    const isMobile = window.innerWidth <= 900;
     // ---------- TAB SWITCHING ----------
     const desktopNav = document.getElementById('desktopNav');
     const mobileMenuContainer = document.getElementById('mobileMenuContainer');
@@ -267,7 +268,7 @@
 
             // ---------- АНИМАЦИЯ ЛИСТИКА ПРИ КЛИКЕ (оптимизированная) ----------
             const leafPool = [];
-            const maxLeaves = 30;
+            const maxLeaves = isMobile ? 15 : 30;
             
             function createLeaf() {
                 const leaf = document.createElement('div');
@@ -293,9 +294,10 @@
                 }
             }
             
+            const clickLeafCount = isMobile ? 1 : 3;
             document.addEventListener('click', (e) => {
                 requestAnimationFrame(() => {
-                    for (let i = 0; i < 3; i++) {
+                    for (let i = 0; i < clickLeafCount; i++) {
                         const leaf = getLeaf();
                         leaf.style.display = '';
                         leaf.style.left = (e.clientX + (Math.random() - 0.5) * 20) + 'px';
