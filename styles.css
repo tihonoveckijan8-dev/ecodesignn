@@ -840,6 +840,9 @@ a, button, .nav-tab, .card, .work-card, .dot, .slider-btn, .btn-primary, input, 
 
 /* ========== ADAPTIVE ========== */
 
+/* Mobile chips — hidden on desktop/tablet */
+.mobile-chips { display: none; }
+
 /* Mobile */
 @media (max-width: 900px) {
     .desktop-nav { display: none; }
@@ -878,17 +881,156 @@ a, button, .nav-tab, .card, .work-card, .dot, .slider-btn, .btn-primary, input, 
     .leaf:nth-child(10) { animation-duration: 8s; }
 
     /* Lighter SVG filters */
-    .circuit-lines svg filter { display: none; }
-    .circuit-lines svg circle { filter: drop-shadow(0 0 3px rgba(74,140,63,0.5)); }
-    .circuit-header { opacity: 0.6; }
-    .circuit-footer { opacity: 0.5; }
+    .circuit-lines svg { display: none; }
+    .mobile-chips { display: block; }
+    .circuit-header { opacity: 1; background: none; }
+    .circuit-footer { opacity: 1; background: none; }
 
-    /* Faster SVG animations */
-    .circuit-header svg circle { animation-duration: 5s !important; }
-    .circuit-header svg circle[fill="#7cb96e"] { animation-duration: 6s !important; }
-    .circuit-header svg circle[fill="#4a8c3f"] { animation-duration: 7s !important; }
-    .circuit-footer svg circle { animation-duration: 6s !important; }
-    .circuit-footer svg circle[fill="#7cb96e"] { animation-duration: 7s !important; }
+    /* Mobile chip system */
+    .mobile-chips {
+        position: absolute;
+        inset: 0;
+        pointer-events: none;
+    }
+
+    /* Chip base */
+    .m-chip {
+        position: absolute;
+        transform: translate(-50%, -50%);
+        border-radius: 3px;
+        border: 1.5px solid rgba(74,140,63,0.4);
+        background: rgba(74,140,63,0.08);
+    }
+    .m-chip::before {
+        content: '';
+        position: absolute;
+        border-radius: 1px;
+    }
+    .m-chip::after {
+        content: '';
+        position: absolute;
+        border-radius: 50%;
+    }
+
+    /* Chip type A — medium, square */
+    .m-chip-a {
+        width: 16px;
+        height: 16px;
+        background: linear-gradient(135deg, rgba(74,140,63,0.1), rgba(124,185,110,0.15));
+        border-color: rgba(74,140,63,0.35);
+        animation: chipGlow 3s ease-in-out infinite;
+    }
+    .m-chip-a::before {
+        inset: 3px;
+        background: rgba(124,185,110,0.2);
+    }
+    .m-chip-a::after {
+        width: 4px;
+        height: 4px;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background: rgba(74,140,63,0.4);
+    }
+
+    /* Chip type B — small, rounded */
+    .m-chip-b {
+        width: 12px;
+        height: 10px;
+        background: linear-gradient(135deg, rgba(124,185,110,0.12), rgba(74,140,63,0.18));
+        border-color: rgba(124,185,110,0.4);
+        border-radius: 4px;
+        animation: chipGlow 2.5s ease-in-out infinite 0.8s;
+    }
+    .m-chip-b::before {
+        inset: 2px;
+        background: rgba(74,140,63,0.25);
+    }
+    .m-chip-b::after {
+        width: 3px;
+        height: 3px;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background: rgba(124,185,110,0.5);
+    }
+
+    /* Chip type C — wide, flat */
+    .m-chip-c {
+        width: 22px;
+        height: 10px;
+        background: linear-gradient(90deg, rgba(74,140,63,0.08), rgba(124,185,110,0.15), rgba(74,140,63,0.08));
+        border-color: rgba(74,140,63,0.3);
+        border-radius: 2px;
+        animation: chipGlow 3.5s ease-in-out infinite 1.2s;
+    }
+    .m-chip-c::before {
+        inset: 2px 4px;
+        background: rgba(124,185,110,0.18);
+    }
+    .m-chip-c::after {
+        width: 3px;
+        height: 3px;
+        top: 50%;
+        left: 35%;
+        transform: translate(-50%, -50%);
+        background: rgba(74,140,63,0.35);
+        box-shadow: 8px 0 0 rgba(74,140,63,0.35);
+    }
+
+    /* Chip type D — tiny, bright */
+    .m-chip-d {
+        width: 8px;
+        height: 8px;
+        background: rgba(124,185,110,0.2);
+        border-color: rgba(124,185,110,0.5);
+        border-radius: 50%;
+        animation: chipGlowBright 2s ease-in-out infinite 0.4s;
+    }
+    .m-chip-d::after {
+        width: 3px;
+        height: 3px;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background: rgba(180,240,160,0.6);
+    }
+
+    /* Trace lines between chips */
+    .m-trace {
+        position: absolute;
+        height: 1px;
+        background: linear-gradient(90deg, rgba(74,140,63,0.15), rgba(124,185,110,0.25), rgba(74,140,63,0.15));
+        transform-origin: left center;
+        transform: translate(0, -50%) rotate(var(--angle, 0deg));
+        animation: tracePulse 4s ease-in-out infinite;
+    }
+
+    /* Animations */
+    @keyframes chipGlow {
+        0%, 100% {
+            box-shadow: 0 0 4px rgba(74,140,63,0.15), 0 0 8px rgba(74,140,63,0.08);
+            border-color: rgba(74,140,63,0.3);
+        }
+        50% {
+            box-shadow: 0 0 12px rgba(74,140,63,0.4), 0 0 24px rgba(74,140,63,0.2), inset 0 0 6px rgba(124,185,110,0.15);
+            border-color: rgba(124,185,110,0.6);
+        }
+    }
+    @keyframes chipGlowBright {
+        0%, 100% {
+            box-shadow: 0 0 6px rgba(124,185,110,0.3), 0 0 12px rgba(74,140,63,0.15);
+            transform: translate(-50%, -50%) scale(1);
+        }
+        50% {
+            box-shadow: 0 0 14px rgba(124,185,110,0.6), 0 0 28px rgba(74,140,63,0.3);
+            transform: translate(-50%, -50%) scale(1.15);
+        }
+    }
+    @keyframes tracePulse {
+        0%, 100% { opacity: 0.3; }
+        50% { opacity: 0.7; }
+    }
 
     .mobile-menu-container .nav-tab { backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); }
     .mobile-overlay { backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); }
