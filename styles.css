@@ -840,8 +840,8 @@ a, button, .nav-tab, .card, .work-card, .dot, .slider-btn, .btn-primary, input, 
 
 /* ========== ADAPTIVE ========== */
 
-/* Mobile chips — hidden on desktop/tablet */
-.mobile-chips { display: none; }
+/* Mobile chips SVG — hidden on desktop/tablet */
+.mc-layer { display: none; }
 
 /* Mobile */
 @media (max-width: 900px) {
@@ -882,154 +882,96 @@ a, button, .nav-tab, .card, .work-card, .dot, .slider-btn, .btn-primary, input, 
 
     /* Lighter SVG filters */
     .circuit-lines svg { display: none; }
-    .mobile-chips { display: block; }
+    .mc-layer { display: block; }
     .circuit-header { opacity: 1; background: none; }
     .circuit-footer { opacity: 1; background: none; }
 
-    /* Mobile chip system */
-    .mobile-chips {
+    /* ===== MOBILE CURRENT — clean, fast ===== */
+    .mc-layer {
         position: absolute;
         inset: 0;
         pointer-events: none;
+        overflow: hidden;
+    }
+    .mc-svg {
+        width: 100%;
+        height: 100%;
+        display: block;
     }
 
-    /* Chip base */
-    .m-chip {
-        position: absolute;
-        transform: translate(-50%, -50%);
-        border-radius: 3px;
-        border: 1.5px solid rgba(74,140,63,0.4);
-        background: rgba(74,140,63,0.08);
+    /* ===== CHIP ANIMATIONS — GPU compositor only (transform + opacity) ===== */
+    /* Дыхание ядра чипа — плавное нарастание/убывание opacity, 3.5s цикл */
+    .chip-core {
+        animation: chipBreathe 3.5s ease-in-out infinite;
     }
-    .m-chip::before {
-        content: '';
-        position: absolute;
-        border-radius: 1px;
+    /* Пульс центрального контакта — быстрее ядра, создаёт иллюзию вычислений */
+    .chip-dot {
+        animation: chipDotPulse 2.5s ease-in-out infinite;
     }
-    .m-chip::after {
-        content: '';
-        position: absolute;
-        border-radius: 50%;
+    /* Вершина чипа — самый быстрый пульс, лёгкий мерцающий эффект */
+    .chip-dot-inner {
+        animation: chipDotPulse 2s ease-in-out infinite 0.3s;
+    }
+    /* Junction-узлы — пульсируют с каскадной задержкой (n1→n7) */
+    .node {
+        animation: nodePulse 3s ease-in-out infinite;
+    }
+    .node.n2 { animation-delay: 0.6s; }
+    .node.n3 { animation-delay: 1.2s; }
+    .node.n4 { animation-delay: 1.8s; }
+    .node.n5 { animation-delay: 0.3s; }
+    .node.n6 { animation-delay: 0.9s; }
+    .node.n7 { animation-delay: 1.5s; }
+
+    /* Keyframes — все используют только opacity (GPU compositor, zero layout cost) */
+    @keyframes chipBreathe {
+        0%, 100% { opacity: 0.12; }
+        50% { opacity: 0.32; }
+    }
+    @keyframes chipDotPulse {
+        0%, 100% { opacity: 0.35; }
+        50% { opacity: 0.65; }
+    }
+    @keyframes nodePulse {
+        0%, 100% { opacity: 0.15; }
+        50% { opacity: 0.45; }
     }
 
-    /* Chip type A — medium, square */
-    .m-chip-a {
-        width: 16px;
-        height: 16px;
-        background: linear-gradient(135deg, rgba(74,140,63,0.1), rgba(124,185,110,0.15));
-        border-color: rgba(74,140,63,0.35);
-        animation: chipGlow 3s ease-in-out infinite;
+    /* ===== MICROCHIP ENERGY VEINS — TOUCH BOOST ===== */
+    /* При длительном касании (400ms) на область чипа:
+       - ускоряем все анимации в 3×
+       - увеличиваем яркость в 1.6×
+       - добавляем свечение трассам
+       CSS transition обеспечивает плавное восстановление при отпускании */
+    .mc-layer {
+        transition: filter 0.6s ease-out;
     }
-    .m-chip-a::before {
-        inset: 3px;
-        background: rgba(124,185,110,0.2);
+    .mc-boost .chip-core {
+        animation-duration: 1s !important;
+        opacity: 0.5 !important;
+        filter: drop-shadow(0 0 8px rgba(0,229,255,0.7));
     }
-    .m-chip-a::after {
-        width: 4px;
-        height: 4px;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        background: rgba(74,140,63,0.4);
+    .mc-boost .chip-dot {
+        animation-duration: 0.8s !important;
+        opacity: 0.9 !important;
+        filter: drop-shadow(0 0 4px rgba(0,229,255,0.9));
     }
-
-    /* Chip type B — small, rounded */
-    .m-chip-b {
-        width: 12px;
-        height: 10px;
-        background: linear-gradient(135deg, rgba(124,185,110,0.12), rgba(74,140,63,0.18));
-        border-color: rgba(124,185,110,0.4);
-        border-radius: 4px;
-        animation: chipGlow 2.5s ease-in-out infinite 0.8s;
+    .mc-boost .chip-dot-inner {
+        animation-duration: 0.7s !important;
+        opacity: 1 !important;
     }
-    .m-chip-b::before {
-        inset: 2px;
-        background: rgba(74,140,63,0.25);
+    .mc-boost .node {
+        animation-duration: 1s !important;
     }
-    .m-chip-b::after {
-        width: 3px;
-        height: 3px;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        background: rgba(124,185,110,0.5);
+    /* Усиление свечения всех частиц при boost */
+    .mc-boost svg circle[r] {
+        filter: brightness(1.6) drop-shadow(0 0 8px rgba(0,229,255,0.9));
+        transition: filter 0.3s ease-out;
     }
-
-    /* Chip type C — wide, flat */
-    .m-chip-c {
-        width: 22px;
-        height: 10px;
-        background: linear-gradient(90deg, rgba(74,140,63,0.08), rgba(124,185,110,0.15), rgba(74,140,63,0.08));
-        border-color: rgba(74,140,63,0.3);
-        border-radius: 2px;
-        animation: chipGlow 3.5s ease-in-out infinite 1.2s;
-    }
-    .m-chip-c::before {
-        inset: 2px 4px;
-        background: rgba(124,185,110,0.18);
-    }
-    .m-chip-c::after {
-        width: 3px;
-        height: 3px;
-        top: 50%;
-        left: 35%;
-        transform: translate(-50%, -50%);
-        background: rgba(74,140,63,0.35);
-        box-shadow: 8px 0 0 rgba(74,140,63,0.35);
-    }
-
-    /* Chip type D — tiny, bright */
-    .m-chip-d {
-        width: 8px;
-        height: 8px;
-        background: rgba(124,185,110,0.2);
-        border-color: rgba(124,185,110,0.5);
-        border-radius: 50%;
-        animation: chipGlowBright 2s ease-in-out infinite 0.4s;
-    }
-    .m-chip-d::after {
-        width: 3px;
-        height: 3px;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        background: rgba(180,240,160,0.6);
-    }
-
-    /* Trace lines between chips */
-    .m-trace {
-        position: absolute;
-        height: 1px;
-        background: linear-gradient(90deg, rgba(74,140,63,0.15), rgba(124,185,110,0.25), rgba(74,140,63,0.15));
-        transform-origin: left center;
-        transform: translate(0, -50%) rotate(var(--angle, 0deg));
-        animation: tracePulse 4s ease-in-out infinite;
-    }
-
-    /* Animations */
-    @keyframes chipGlow {
-        0%, 100% {
-            box-shadow: 0 0 4px rgba(74,140,63,0.15), 0 0 8px rgba(74,140,63,0.08);
-            border-color: rgba(74,140,63,0.3);
-        }
-        50% {
-            box-shadow: 0 0 12px rgba(74,140,63,0.4), 0 0 24px rgba(74,140,63,0.2), inset 0 0 6px rgba(124,185,110,0.15);
-            border-color: rgba(124,185,110,0.6);
-        }
-    }
-    @keyframes chipGlowBright {
-        0%, 100% {
-            box-shadow: 0 0 6px rgba(124,185,110,0.3), 0 0 12px rgba(74,140,63,0.15);
-            transform: translate(-50%, -50%) scale(1);
-        }
-        50% {
-            box-shadow: 0 0 14px rgba(124,185,110,0.6), 0 0 28px rgba(74,140,63,0.3);
-            transform: translate(-50%, -50%) scale(1.15);
-        }
-    }
-    @keyframes tracePulse {
-        0%, 100% { opacity: 0.3; }
-        50% { opacity: 0.7; }
+    /* Усиление яркости трасс при boost */
+    .mc-boost svg path[stroke] {
+        stroke-opacity: 0.35 !important;
+        transition: stroke-opacity 0.3s ease-out;
     }
 
     .mobile-menu-container .nav-tab { backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); }
@@ -1060,6 +1002,7 @@ a, button, .nav-tab, .card, .work-card, .dot, .slider-btn, .btn-primary, input, 
     .tab-content { animation-duration: 0.2s; }
 
     .tab-content:not(.active) { content-visibility: hidden; }
+}
 }
 
 /* Tablet landscape */
