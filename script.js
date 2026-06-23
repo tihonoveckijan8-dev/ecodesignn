@@ -300,6 +300,47 @@
     });
 
     /* ================================================================
+     * MICROCHIP ENERGY VEINS — touch interaction
+     * Long press on chip area → accelerate current + boost glow.
+     * Uses CSS class toggle on .mc-layer for GPU-accelerated boost.
+     * ================================================================ */
+    if (isMobile) {
+        const mcLayers = document.querySelectorAll('.mc-layer');
+        mcLayers.forEach(function(layer) {
+            let boostTimer = null;
+            let isActive = false;
+
+            function activateBoost() {
+                if (isActive) return;
+                isActive = true;
+                layer.classList.add('mc-boost');
+            }
+
+            function deactivateBoost() {
+                isActive = false;
+                layer.classList.remove('mc-boost');
+                if (boostTimer) {
+                    clearTimeout(boostTimer);
+                    boostTimer = null;
+                }
+            }
+
+            // Long press: 400ms hold activates boost
+            layer.addEventListener('touchstart', function(e) {
+                boostTimer = setTimeout(activateBoost, 400);
+            }, { passive: true });
+
+            layer.addEventListener('touchend', deactivateBoost, { passive: true });
+            layer.addEventListener('touchcancel', deactivateBoost, { passive: true });
+
+            // Prevent context menu on long press
+            layer.addEventListener('contextmenu', function(e) {
+                e.preventDefault();
+            });
+        });
+    }
+
+    /* ================================================================
      * CLICK LEAF ANIMATION — object pool, requestAnimationFrame
      * ================================================================ */
     const leafPool = [];
